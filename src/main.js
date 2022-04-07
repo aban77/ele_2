@@ -1,10 +1,20 @@
-import Vue from 'vue'
-import App from './App.vue'
-import router from './router'
+import Vue from 'vue';
+import App from './App.vue';
+import router from './router';
+import './common/stylus/index.styl';
+import store from './store/store';
 
-Vue.config.productionTip = false
-
+Vue.config.productionTip = false;
+console.log('app', App);
 new Vue({
   router,
+  store,
   render: h => h(App)
-}).$mount('#app')
+}).$mount('#app');
+
+/* eslint-disable no-new */
+// new Vue({
+//   el: '#body',
+//   router,
+//   components: { 'app': App }
+// })
