@@ -61,7 +61,7 @@
 </template>
 
 <script type="text/ecmascript-6">
-import { getGoods } from '../../api/index';
+import { getGoods } from '../../api';
 import supportIco from '../support-ico/support-ico';
 import cartControl from '../cart-control/cart-control';
 import foodDetail from '../food-detail/food-detail';

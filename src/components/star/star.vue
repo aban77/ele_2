@@ -1,7 +1,11 @@
 <template>
-  <div class="star" >
+  <div class="star">
     <div :class="starSizeClass">
-      <span v-for="(itemClass, index) in itemClasses" :key="index" class="star-item" :class="itemClass"
+      <span
+        v-for="(itemClass, index) in itemClasses"
+        :key="index"
+        class="star-item"
+        :class="itemClass"
       ></span>
     </div>
   </div>
@@ -31,15 +35,13 @@ export default {
       for (let i = 0; i < LENGTH; i++) {
         if (i < inter) {
           result.push(CLSON);
-        }
-        else if (i === inter) {
+        } else if (i === inter) {
           if (halfFlag) {
             result.push(CLSHALF);
-          }else{
+          } else {
             result.push(CLSOFF);
           }
-        }
-        else{
+        } else {
           result.push(CLSOFF);
         }
       }
@@ -66,7 +68,7 @@ export default {
       width: 20px
       height: 20px
       margin-right: 22px
-      background-size: 20px 20px  
+      background-size: 20px 20px
     .on
       bg-image('star48_on')
     .half
@@ -79,7 +81,7 @@ export default {
       width: 15px
       height: 15px
       margin-right: 6px
-      background-size: 15px 15px  
+      background-size: 15px 15px
     .on
       bg-image('star36_on')
     .half
@@ -92,7 +94,7 @@ export default {
       width: 10px
       height: 10px
       margin-right: 3px
-      background-size: 10px 10px  
+      background-size: 10px 10px
     .on
       bg-image('star24_on')
     .half
