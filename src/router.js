@@ -1,10 +1,13 @@
 import Vue from 'vue';
 import Router from 'vue-router';
+import { getLocalStorage } from './api/mUtils';
 const home = () => import(/* webpackChunkName: "home" */ './page/home/home');
 const order = () => import(/* webpackChunkName: "order" */ './page/order/order');
 const profile = () => import(/* webpackChunkName: "profile" */ './page/profile/profile');
+const profileInfo = () => import(/* webpackChunkName: "info" */ './page/profile/children/info/info');
 const login = () => import(/* webpackChunkName: "login" */ './page/login/login');
-// const shop = () => import(/* webpackChunkName: "home" */ './page/shop/shop');
+const shop = () => import(/* webpackChunkName: "shop" */ './page/shop/shop');
+const goods = () => import(/* webpackChunkName: "goods" */ './components/goods/goods');
 // import goods from './components/goods/goods.vue';
 // import ratings from './components/ratings/ratings';
 // import seller from './components/seller/seller';
@@ -20,7 +23,7 @@ const router = new Router({
       redirect: '/home'
     },
     {
-      path: '/home/',
+      path: '/home',
       name: 'home',
       component: home
     },
@@ -30,19 +33,38 @@ const router = new Router({
     //   component: shop
     // },
     {
-      path: '/order/',
+      path: '/order',
       name: 'order',
       component: order
     },
     {
-      path: '/profile/',
+      path: '/profile',
       name: 'profile',
-      component: profile
+      component: profile,
+      children: [
+        {
+          path: 'info', // 个人信息详情页
+          component: profileInfo
+
+        }]
+
     },
     {
-      path: '/login/',
+      path: '/login',
       name: 'login',
       component: login
+    },
+    {
+      path: '/shop',
+      name: 'shop',
+      component: shop,
+      redirect: '/shop/goods',
+      children: [
+        {
+          path: 'goods',
+          component: goods
+
+        }]
     }
   ]
 });
@@ -50,6 +72,19 @@ const VueRouterPush = Router.prototype.push;
 Router.prototype.push = function push (to) {
   return VueRouterPush.call(this, to).catch(err => err);
 };
+
+// 导航守卫;
+router.beforeEach((to, from, next) => {
+  if (to.path === '/login') {
+    next();
+  } else {
+    let token = getLocalStorage('Authorization');
+    if (token) {
+      router.app.$options.store.dispatch('getUserInfo', token);
+    }
+    next();
+  }
+});
 
 export default router;
 // export default new Router({

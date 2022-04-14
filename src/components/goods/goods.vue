@@ -37,17 +37,18 @@
               <div v-show="foodItem.description"
                    class="description">{{foodItem.description}}</div>
               <div class="sell-info">
-                <span class="sellCount">月售{{foodItem.sellCount}}份</span>
-                <span class="rating">好评率{{foodItem.rating}}%</span>
+                <span class="sellCount">月售{{foodItem.month_sales}}份</span>
+                <span class="rating">好评率{{foodItem.satisfy_rate}}</span>
               </div>
               <div class="price-info">
-                ￥<span class="price">{{foodItem.price}}</span>
+                <span class="price" v-if="foodItem.specfoods[0]">￥{{foodItem.specfoods[0].price}}</span>
+                <!-- <span  class="price" v-if="foodItem.specifications.length">起</span> -->
                 <s v-show="foodItem.oldPrice"
                    class="delete-price">￥<span class="oldPrice">{{foodItem.oldPrice}}</span></s>
               </div>
             </div>
             <div class="cart">
-              <cart-control :food="foodItem"></cart-control>
+              <cart-control v-if="foodItem.specfoods[0] && !foodItem.specfoods[0].sold_out" :food="foodItem" :shopId="shopId"></cart-control>
             </div>
           </li>
         </ul>
@@ -61,7 +62,7 @@
 </template>
 
 <script type="text/ecmascript-6">
-import { getGoods } from '../../api';
+import { getFoodList } from '../../api/getData';
 import supportIco from '../support-ico/support-ico';
 import cartControl from '../cart-control/cart-control';
 import foodDetail from '../food-detail/food-detail';
@@ -72,7 +73,10 @@ export default {
       heightList: [],
       currentIndex: 0,
       detailFood: {},
-      detailFoodShow: false
+      detailFoodShow: false,
+      shopId: null,
+      geohash: ''
+
     };
   },
   props: {
@@ -94,6 +98,13 @@ export default {
     showFoodDetail (food) {
       this.detailFood = food;
       this.detailFoodShow = true;
+    },
+    async getGoods (id) {
+      this.goods = await getFoodList(id);
+      console.log(this.goods);
+      this.$nextTick(() => {
+        this.calHeight();
+      });
     }
   },
   watch: {
@@ -115,13 +126,16 @@ export default {
 
   },
   created () {
-    getGoods().then(res => {
-      this.goods = res;
-      // console.log(res);
-      this.$nextTick(() => {
-        this.calHeight();
-      });
-    });
+    this.geohash = this.$route.query.geohash;
+    this.shopId = this.$route.query.id;
+    this.getGoods(this.shopId);
+  //   getGoods().then(res => {
+  //     this.goods = res;
+  //     // console.log(res);
+  //     this.$nextTick(() => {
+  //       this.calHeight();
+  //     });
+  //   });
   },
   mounted () {
     this.$refs.foods.addEventListener('scroll', (event) => {

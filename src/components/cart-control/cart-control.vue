@@ -1,42 +1,65 @@
 <template>
   <div class="cart-control">
     <transition name="move">
-      <div v-show="food.count>0"
+      <div v-show="foodNum>0"
            class="decrease-outer"
-           @click.stop="decCount">
+           @click.stop="decCount (food.category_id, food.item_id, food.specfoods[0].food_id, food.specfoods[0].name,food.specfoods[0].price, food.specfoods[0].packing_fee, food.specfoods[0].sku_id, food.specfoods[0].stock)">
         <span class="icon-remove_circle_outline cart-decrease"></span>
       </div>
     </transition>
-    <div v-show="food.count>0"
-         class="cart-count">{{food.count}}</div>
+    <div v-show="foodNum>0"
+         class="cart-count">{{foodNum}}</div>
     <span class="cart-add icon-add_circle"
-          @click.stop="addClick"></span>
+          @click.stop="addClick(food.category_id, food.item_id, food.specfoods[0].food_id, food.specfoods[0].name, food.specfoods[0].price, '', food.specfoods[0].packing_fee, food.specfoods[0].sku_id, food.specfoods[0].stock, $event)"></span>
   </div>
 </template>
 
 <script type="text/ecmascript-6">
-import Vue from 'vue';
+import { mapState, mapMutations } from 'vuex';
 export default {
   props: {
-    food: Object
+    food: Object,
+    shopId: String
 
   },
   methods: {
-    addClick (event) {
-      if (!this.food.count) {
-        Vue.set(this.food, 'count', 1);
-      } else {
-        this.food.count++;
-      }
-      // let nowStatus = this.$store.state.cartClickStatus + 1;
+    ...mapMutations([
+      'ADD_CART', 'REDUCE_CART'
+    ]),
+    addClick (category_id, item_id, food_id, name, price, specs, packing_fee, sku_id, stock, event) {
+      this.ADD_CART({ shopid: this.shopId, category_id, item_id, food_id, name, price, specs, packing_fee, sku_id, stock });
+
       this.$store.commit('cartClickEvent', event.target);
     },
-    decCount () {
-      if (this.food.count) {
-        this.food.count--;
-      }
+    decCount (category_id, item_id, food_id, name, price, specs) {
+      this.REDUCE_CART({ shopid: this.shopId, category_id, item_id, food_id, name, price, specs });
     }
 
+  },
+  computed: {
+    ...mapState([
+      'cartList'
+    ]),
+    /**
+    * 监听cartList变化，更新当前商铺的购物车信息shopCart，同时返回一个新的对象
+    */
+    shopCart: function () {
+      return Object.assign({}, this.cartList[this.shopId]);
+    },
+    // shopCart变化的时候重新计算当前商品的数量
+    foodNum: function () {
+      let category_id = this.food.category_id;
+      let item_id = this.food.item_id;
+      if (this.shopCart && this.shopCart[category_id] && this.shopCart[category_id][item_id]) {
+        let num = 0;
+        Object.values(this.shopCart[category_id][item_id]).forEach((item, index) => {
+          num += item.num;
+        });
+        return num;
+      } else {
+        return 0;
+      }
+    }
   }
 };
 </script>

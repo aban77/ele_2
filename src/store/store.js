@@ -1,26 +1,23 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
-
+import mutations from './mutations';
+import actions from './action';
 Vue.use(Vuex);
 
 const store = new Vuex.Store({
   state: {
-    selectedFoods: [],
+    cartList: {},
+    // selectedFoods: [],
     cartClickStatus: 0,
-    cartClickTarget: {}
+    cartClickTarget: {},
+    userInfo: null, // 用户信息
+    token: '',
+    login: false,
+    latitude: '', // 当前位置纬度
+    longitude: '', // 当前位置经度
+    geohash: '31.23037,121.473701' // 地址geohash值
   },
-  getters: {
-
-  },
-  mutations: {
-    cartClickEvent (state, target) {
-      state.cartClickStatus++;
-      state.cartClickTarget = target;
-      console.log('store.state', state);
-    },
-    selectedChange(state, foods) {
-      state.selectedFoods = foods;
-    }
-  }
+  mutations,
+  actions
 });
 export default store;

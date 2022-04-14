@@ -7,11 +7,11 @@
           <span class="brand"></span>
           <span class="name">{{ seller.name }}</span>
         </div>
-        <div class="description">
-          {{ seller.description }}/{{ seller.deliveryTime }}分钟送达
+        <div class="description" v-if="seller.delivery_mode">
+          {{ seller.delivery_mode.text }}/{{ seller.deliveryTime }}分钟送达
         </div>
         <div v-if="seller.supports" class="supports">
-          <support-ico :size="1" :type="seller.supports[0].type"></support-ico>
+          <!-- <support-ico :size="1" :type="seller.supports[0].type"></support-ico> -->
           <span class="supports-description">{{
             seller.supports[0].description
           }}</span>
@@ -39,7 +39,7 @@
 </template>
 
 <script type="text/ecmascript-6">
-import supportIco from '../support-ico/support-ico';
+// import supportIco from '../support-ico/support-ico';
 import headerDetail from '../header-detail/header-detail';
 export default {
   data() {
@@ -59,7 +59,7 @@ export default {
     }
   },
   components: {
-    'support-ico': supportIco,
+    // 'support-ico': supportIco,
     'header-detail': headerDetail
   }
 };

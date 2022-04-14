@@ -29,7 +29,27 @@ module.exports = {
       });
     },
     port: 8888,
-    proxy: 'http://localhost:8001'
+    // proxy: {
+    //   '/api': {
+    //     target: 'https://elm.cangdu.org',
+    //     changeOrigin: true,
+    //     pathRewrite: {
+    //       '^/api': '/'
+    //     }
+    //   },
+    //   '/': {
+    //     target: 'http://localhost:8001',
+    //     changeOrigin: true,
+    //     bypass: function (req, res, proxyOptions) {
+    //       if (req.headers.accept.indexOf('html') !== -1) {
+    //         console.log('Skipping proxy for browser request.');
+    //         return '/index.html';
+    //       }
+    //     }
+    //   }
+    // },
+    proxy: 'http://localhost:8001',
+    'open': true
 
   }
 };

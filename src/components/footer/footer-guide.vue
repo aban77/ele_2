@@ -18,9 +18,6 @@
 <script type="text/ecmascript-6">
 import 'font-awesome/css/font-awesome.min.css';
 export default {
-  mounted() {
-    console.log(this.$route.path.indexOf('/home'));
-  }
 };
 </script>
 

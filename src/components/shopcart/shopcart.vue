@@ -34,9 +34,9 @@
               class="select-item border-1px">
             <div class="name">{{item.name}}</div>
             <div class="select-item-right">
-              <span class="price">￥<span class="price_inner">{{item.price * item.count}}</span></span>
+              <span class="price">￥<span class="price_inner">{{item.specfoods[0].price  * item.count}}</span></span>
               <cart-control class="cart-control"
-                            :food="item"></cart-control>
+                            :food="item" :shopId="shopId"></cart-control>
             </div>
           </li>
         </ul>
@@ -64,7 +64,7 @@
 
 <script type="text/ecmascript-6">
 import cartControl from '../cart-control/cart-control';
-
+import { mapState, mapMutations } from 'vuex';
 const BALL_NUMBER = 5;
 export default {
   data () {
@@ -72,6 +72,7 @@ export default {
       totalPrice: 0,
       totalNumber: 0,
       detailStatus: false,
+      selectFoods: [],
       balls: [
         {
           show: false
@@ -92,6 +93,11 @@ export default {
       dropBalls: [],
       popBalls: []
     };
+  },
+  props: {
+    deliveryPrice: Number,
+    minPrice: Number,
+    shopId: String
   },
   methods: {
     changeStatus () {
@@ -142,7 +148,6 @@ export default {
       let index = this.popBalls.shift();
       this.balls[index].show = false;
     }
-
   },
   watch: {
     selectFoods: {
@@ -152,7 +157,7 @@ export default {
         let number = 0;
         val.forEach(food => {
           if (food.count) {
-            price += food.price * food.count;
+            price += food.specfoods[0].price * food.count;
             number += food.count;
           };
         });
@@ -174,6 +179,9 @@ export default {
 
   },
   computed: {
+    ...mapState([
+      'latitude', 'longitude', 'cartList'
+    ]),
     payText () {
       if (this.totalPrice === 0) {
         return '￥' + this.minPrice + '起送';
@@ -195,11 +203,6 @@ export default {
     }
   },
 
-  props: {
-    selectFoods: Array,
-    deliveryPrice: Number,
-    minPrice: Number
-  },
   components: {
     'cart-control': cartControl
   }

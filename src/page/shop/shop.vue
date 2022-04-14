@@ -2,40 +2,50 @@
   <div class="shop">
     <v-header :seller="seller"></v-header>
     <div class="tab border-1px">
-      <router-link to="/goods">商品</router-link>
-      <router-link to="/ratings">评价</router-link>
-      <router-link to="/seller">商家</router-link>
+      <router-link :to="{path:'/shop/goods',query:{geohash: '31.23037,121.473701', id: shopId}}">商品</router-link>
+      <router-link to="/shop/ratings">评价</router-link>
+      <router-link to="/shop/seller">商家</router-link>
+
     </div>
     <keep-alive>
       <router-view :seller="seller" />
     </keep-alive>
     <div class="shopcart-wrapper">
       <shopcart ref="shopcart"
-                :selectFoods="this.$store.state.selectedFoods"
-                :deliveryPrice="seller.deliveryPrice"
-                :minPrice="seller.minPrice"></shopcart>
+                :deliveryPrice="seller.float_delivery_fee"
+                :minPrice="seller.float_minimum_order_amount"
+                :shopId='shopId'></shopcart>
     </div>
   </div>
 </template>
 
 <script>
+import { mapMutations } from 'vuex';
 import header from '../../components/header/header';
-import { getSeller } from '../../api/index';
+import { getShopInfo } from '../../api/getData';
 import shopcart from '../../components/shopcart/shopcart';
 export default {
   data () {
     return {
       seller: {},
-      userID: 123
+      shopId: null,
+      geohash: '' // geohash位置信息
     };
   },
-  watch: {
-
+  methods: {
+    ...mapMutations([
+      'INIT_BUYCART'
+    ]),
+    async getSeller(id) {
+      this.seller = await getShopInfo(id);
+      console.log('seller', this.seller);
+    }
   },
-  created () {
-    getSeller().then((res) => {
-      this.seller = res;
-    });
+  created() {
+    this.geohash = this.$route.query.geohash;
+    this.shopId = this.$route.query.id;
+    this.getSeller(this.shopId);
+    this.INIT_BUYCART();
   },
   components: {
     'v-header': header,
