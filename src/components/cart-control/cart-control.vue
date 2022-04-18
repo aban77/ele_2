@@ -17,6 +17,11 @@
 <script type="text/ecmascript-6">
 import { mapState, mapMutations } from 'vuex';
 export default {
+  data() {
+    return {
+      foodNum: 0
+    };
+  },
   props: {
     food: Object,
     shopId: String
@@ -39,26 +44,49 @@ export default {
   computed: {
     ...mapState([
       'cartList'
-    ]),
+    ])
     /**
     * 监听cartList变化，更新当前商铺的购物车信息shopCart，同时返回一个新的对象
     */
-    shopCart: function () {
-      return Object.assign({}, this.cartList[this.shopId]);
-    },
-    // shopCart变化的时候重新计算当前商品的数量
-    foodNum: function () {
-      let category_id = this.food.category_id;
-      let item_id = this.food.item_id;
-      if (this.shopCart && this.shopCart[category_id] && this.shopCart[category_id][item_id]) {
-        let num = 0;
-        Object.values(this.shopCart[category_id][item_id]).forEach((item, index) => {
-          num += item.num;
-        });
-        return num;
-      } else {
-        return 0;
-      }
+    // shopCart: function () {
+    //   return Object.assign({}, this.cartList[this.shopId]);
+    // },
+    // // shopCart变化的时候重新计算当前商品的数量
+    // foodNum: function () {
+    //   let category_id = this.food.category_id;
+    //   let item_id = this.food.item_id;
+    //   if (this.shopCart && this.shopCart[category_id] && this.shopCart[category_id][item_id]) {
+    //     let num = 0;
+    //     Object.values(this.shopCart[category_id][item_id]).forEach((item, index) => {
+    //       num += item.num;
+    //     });
+    //     return num;
+    //   } else {
+    //     return 0;
+    //   }
+    // }
+  },
+  watch: {
+
+    cartList: {
+      handler: function (val, oldVal) {
+        console.log('change');
+        let shopCart = this.cartList[this.shopId];
+        let category_id = this.food.category_id;
+        let item_id = this.food.item_id;
+        if (shopCart && shopCart[category_id] && shopCart[category_id][item_id]) {
+          let num = 0;
+          Object.values(shopCart[category_id][item_id]).forEach((item, index) => {
+            num += item.num;
+          });
+          this.foodNum = num;
+        } else {
+          this.foodNum = 0;
+        }
+      },
+      deep: false,
+      immediate: true
+
     }
   }
 };

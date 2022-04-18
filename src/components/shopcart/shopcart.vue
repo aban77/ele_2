@@ -29,12 +29,12 @@
                 @click="empty">清空</span>
         </div>
         <ul class="shopcart-content">
-          <li v-for="(item,index) in selectFoods"
+          <li v-for="(item,index) in cartFoodList"
               :key="index"
               class="select-item border-1px">
             <div class="name">{{item.name}}</div>
             <div class="select-item-right">
-              <span class="price">￥<span class="price_inner">{{item.specfoods[0].price  * item.count}}</span></span>
+              <span class="price">￥<span class="price_inner" >{{item.num  * item.price}}</span></span>
               <cart-control class="cart-control"
                             :food="item" :shopId="shopId"></cart-control>
             </div>
@@ -64,7 +64,7 @@
 
 <script type="text/ecmascript-6">
 import cartControl from '../cart-control/cart-control';
-import { mapState, mapMutations } from 'vuex';
+import { mapState } from 'vuex';
 const BALL_NUMBER = 5;
 export default {
   data () {
@@ -72,7 +72,7 @@ export default {
       totalPrice: 0,
       totalNumber: 0,
       detailStatus: false,
-      selectFoods: [],
+      cartFoodList: [],
       balls: [
         {
           show: false
@@ -108,8 +108,8 @@ export default {
       this.detailStatus = !this.detailStatus;
     },
     empty () {
-      this.selectFoods.forEach(food => {
-        food.count = 0;
+      this.cartFoodList.forEach(food => {
+        food.cartFoodList = 0;
       });
     },
     _ballDrop (target) {
@@ -121,10 +121,10 @@ export default {
           break;
         }
       }
-      console.log(this.balls);
+      // console.log(this.balls);
     },
     beforeEnter (ele) {
-      console.log(ele);
+      // console.log(ele);
       let index = this.dropBalls.shift();
       this.popBalls.push(index);
       let x = this.balls[index].el.getBoundingClientRect().left - 32;
@@ -147,33 +147,61 @@ export default {
     afterEnter (ele) {
       let index = this.popBalls.shift();
       this.balls[index].show = false;
+    },
+    /**
+             * 初始化和shopCart变化时，重新获取购物车改变过的数据，赋值 categoryNum，totalPrice，cartFoodList，整个数据流是自上而下的形式，所有的购物车数据都交给vuex统一管理，包括购物车组件中自身的商品数量，使整个数据流更加清晰
+             */
+    initCategoryNum() {
+      let cartFoodNum = 0;
+      this.totalPrice = 0;
+      this.cartFoodList = [];
+      let num = 0;
+      Object.keys(this.shopCart).forEach(categoryId => {
+        if (this.shopCart && this.shopCart[categoryId]) {
+          Object.keys(this.shopCart[categoryId]).forEach(itemid => {
+            Object.keys(this.shopCart[categoryId][itemid]).forEach(foodid => {
+              let foodItem = this.shopCart[categoryId][itemid][foodid];
+              num += foodItem.num;
+              this.totalPrice += foodItem.num * foodItem.price;
+              if (foodItem.num > 0) {
+                this.cartFoodList[cartFoodNum] = {};
+                this.cartFoodList[cartFoodNum].category_id = categoryId;
+                this.cartFoodList[cartFoodNum].item_id = itemid;
+                this.cartFoodList[cartFoodNum].food_id = foodid;
+                this.cartFoodList[cartFoodNum].num = foodItem.num;
+                this.cartFoodList[cartFoodNum].price = foodItem.price;
+                this.cartFoodList[cartFoodNum].name = foodItem.name;
+                this.cartFoodList[cartFoodNum].specfoods = [];
+                this.cartFoodList[cartFoodNum].specfoods[0] = {};
+                this.cartFoodList[cartFoodNum].specfoods[0].food_id = foodid;
+                this.cartFoodList[cartFoodNum].specfoods[0].name = foodItem.name;
+                this.cartFoodList[cartFoodNum].specfoods[0].price = foodItem.price;
+                this.cartFoodList[cartFoodNum].specfoods[0].packing_fee = foodItem.packing_fee;
+                this.cartFoodList[cartFoodNum].specfoods[0].sku_id = foodItem.sku_id;
+                this.cartFoodList[cartFoodNum].specfoods[0].stock = foodItem.stock;
+                cartFoodNum++;
+              }
+            });
+          });
+        }
+      });
+      this.totalPrice = this.totalPrice.toFixed(2);
+      this.totalNumber = num;
     }
   },
   watch: {
-    selectFoods: {
-      handler (val, oldVal) {
-        // console.log('watch', this.selectFoods);
-        let price = 0;
-        let number = 0;
-        val.forEach(food => {
-          if (food.count) {
-            price += food.specfoods[0].price * food.count;
-            number += food.count;
-          };
-        });
-        this.totalPrice = price;
-        this.totalNumber = number;
-      },
-      deep: true
+    shopCart: function() {
+      this.initCategoryNum();
+      console.log('change3');
     },
+
     totalNumber (val, oldVal) {
       if (val === 0) {
         console.log(val);
         this.detailStatus = false;
       }
     },
-    cartClick (val, oldVal) {
-      console.log(val);
+    cartClick () {
       this._ballDrop(this.$store.state.cartClickTarget);
     }
 
@@ -200,7 +228,13 @@ export default {
     },
     cartClick () {
       return this.$store.state.cartClickStatus;
+    },
+    shopCart: function () {
+      console.log('change2');
+      // console.log('shopcart', this.cartList[this.shopId]);
+      return { ...this.cartList[this.shopId] }; // 返回this.cartList[this.shopId]的复制
     }
+
   },
 
   components: {

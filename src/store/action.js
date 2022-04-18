@@ -1,7 +1,8 @@
 import { getUser } from '../api/getData';
+
 // import { GET_USERINFO } from './mutations.js';
 export default {
-  async getUserInfo({ state, commit }, token) {
+  async getUserInfo({ commit }, token) {
     console.log('actionstoken', typeof token);
     let res = await getUser(token);
     // 如果前端拿到状态码为401，就清除token信息并跳转到登录页面

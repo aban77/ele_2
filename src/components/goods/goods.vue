@@ -28,10 +28,11 @@
           <li v-for="(foodItem,foodIndex) in item.foods"
               :key="foodIndex"
               class="food-item border-1px"
-              @click="showFoodDetail(foodItem)">
+              >
             <img :src="foodItem.icon"
                  alt=""
-                 class="food-icon">
+                 class="food-icon"
+                 @click="showFoodDetail(foodItem)">
             <div class="food-info">
               <div class="name">{{foodItem.name}}</div>
               <div v-show="foodItem.description"
@@ -66,6 +67,7 @@ import { getFoodList } from '../../api/getData';
 import supportIco from '../support-ico/support-ico';
 import cartControl from '../cart-control/cart-control';
 import foodDetail from '../food-detail/food-detail';
+
 export default {
   data () {
     return {
@@ -101,30 +103,31 @@ export default {
     },
     async getGoods (id) {
       this.goods = await getFoodList(id);
-      console.log(this.goods);
+      console.log('this.goods', this.goods);
       this.$nextTick(() => {
         this.calHeight();
       });
     }
   },
-  watch: {
-    goods: {
-      handler: function (val, oldVal) {
-        // console.log(val);
-        let foods = [];
-        val.forEach(good => {
-          good.foods.forEach(food => {
-            if (food.count) {
-              foods.push(food);
-            }
-          });
-        });
-        this.$store.commit('selectedChange', foods);
-      },
-      deep: true
-    }
 
-  },
+  // watch: {
+  //   goods: {
+  //     handler: function (val, oldVal) {
+  //       // console.log(val);
+  //       let foods = [];
+  //       val.forEach(good => {
+  //         good.foods.forEach(food => {
+  //           if (food.count) {
+  //             foods.push(food);
+  //           }
+  //         });
+  //       });
+  //       this.$store.commit('selectedChange', foods);
+  //     },
+  //     deep: true
+  //   }
+
+  // },
   created () {
     this.geohash = this.$route.query.geohash;
     this.shopId = this.$route.query.id;

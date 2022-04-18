@@ -2,7 +2,7 @@
   <div class="shop">
     <v-header :seller="seller"></v-header>
     <div class="tab border-1px">
-      <router-link :to="{path:'/shop/goods',query:{geohash: '31.23037,121.473701', id: shopId}}">商品</router-link>
+      <router-link :to="{path:'/shop/goods',query:{geohash: '31.23037,121.473701', id: shopId}}" >商品</router-link>
       <router-link to="/shop/ratings">评价</router-link>
       <router-link to="/shop/seller">商家</router-link>
 
@@ -29,7 +29,8 @@ export default {
     return {
       seller: {},
       shopId: null,
-      geohash: '' // geohash位置信息
+      geohash: '', // geohash位置信息
+      goods: []
     };
   },
   methods: {
@@ -39,12 +40,18 @@ export default {
     async getSeller(id) {
       this.seller = await getShopInfo(id);
       console.log('seller', this.seller);
+    },
+    getGoods(arr) {
+      this.goods = arr;
+      console.log('shop', this.goods);
     }
   },
   created() {
     this.geohash = this.$route.query.geohash;
     this.shopId = this.$route.query.id;
     this.getSeller(this.shopId);
+  },
+  mounted() {
     this.INIT_BUYCART();
   },
   components: {
