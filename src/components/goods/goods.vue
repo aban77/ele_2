@@ -109,25 +109,6 @@ export default {
       });
     }
   },
-
-  // watch: {
-  //   goods: {
-  //     handler: function (val, oldVal) {
-  //       // console.log(val);
-  //       let foods = [];
-  //       val.forEach(good => {
-  //         good.foods.forEach(food => {
-  //           if (food.count) {
-  //             foods.push(food);
-  //           }
-  //         });
-  //       });
-  //       this.$store.commit('selectedChange', foods);
-  //     },
-  //     deep: true
-  //   }
-
-  // },
   created () {
     this.geohash = this.$route.query.geohash;
     this.shopId = this.$route.query.id;

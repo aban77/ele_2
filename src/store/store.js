@@ -8,7 +8,7 @@ const store = new Vuex.Store({
   state: {
     cartList: {},
     // selectedFoods: [],
-    cartClickStatus: 0,
+    cartClickStatus: false,
     cartClickTarget: {},
     userInfo: null, // 用户信息
     token: '',

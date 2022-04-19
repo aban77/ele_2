@@ -64,7 +64,7 @@
 
 <script type="text/ecmascript-6">
 import cartControl from '../cart-control/cart-control';
-import { mapState } from 'vuex';
+import { mapState, mapMutations } from 'vuex';
 const BALL_NUMBER = 5;
 export default {
   data () {
@@ -100,6 +100,9 @@ export default {
     shopId: String
   },
   methods: {
+    ...mapMutations([
+      'CLEAR_CART'
+    ]),
     changeStatus () {
       if (!this.totalPrice) {
         this.detailStatus = false;
@@ -108,9 +111,10 @@ export default {
       this.detailStatus = !this.detailStatus;
     },
     empty () {
-      this.cartFoodList.forEach(food => {
-        food.cartFoodList = 0;
-      });
+      // this.cartFoodList.forEach(food => {
+      //   food.cartFoodList = 0;
+      // });
+      this.CLEAR_CART(this.shopId);
     },
     _ballDrop (target) {
       for (let i = 0; i < BALL_NUMBER; i++) {
@@ -127,12 +131,20 @@ export default {
       // console.log(ele);
       let index = this.dropBalls.shift();
       this.popBalls.push(index);
-      let x = this.balls[index].el.getBoundingClientRect().left - 32;
-      let y = -(window.innerHeight - this.balls[index].el.getBoundingClientRect().top - 22);
+      let position = this.balls[index].el.getBoundingClientRect();
+
+      console.log('ballposition', position.left, position.bottom);
+      let x = position.left - 32;
+      let y = -(window.innerHeight - position.top - 22);
+
+      console.log('x', x);
+      console.log('y', y);
       ele.style.webkitTransform = `translate3d(${x}px,0,0)`;
       ele.style.transform = `translate3d(${x}px,0,0)`;
       ele.querySelector('.ball_inner').style.webkitTransform = `translate3d(0, ${y}px, 0)`;
       ele.querySelector('.ball_inner').style.transform = `translate3d(0, ${y}px, 0)`;
+      console.log('window', window.outerHeight, window.outerWidth);
+      console.log('window', window.innerHeight, window.innerWidth);
     },
     enter (ele) {
       this.$nextTick(() => {
@@ -141,18 +153,16 @@ export default {
         ele.querySelector('.ball_inner').style.webkitTransform = `translate3d(0, 0, 0)`;
         ele.querySelector('.ball_inner').style.webkitTransform = 'translate3d(0,0,0)';
       });
-
-      // ele.style.bottom = bottom;
     },
     afterEnter (ele) {
       let index = this.popBalls.shift();
       this.balls[index].show = false;
     },
     /**
-             * 初始化和shopCart变化时，重新获取购物车改变过的数据，赋值 categoryNum，totalPrice，cartFoodList，整个数据流是自上而下的形式，所有的购物车数据都交给vuex统一管理，包括购物车组件中自身的商品数量，使整个数据流更加清晰
-             */
+     * 初始化和shopCart变化时，重新获取购物车改变过的数据，赋值 categoryNum，totalPrice，cartFoodList，整个数据流是自上而下的形式，所有的购物车数据都交给vuex统一管理，包括购物车组件中自身的商品数量，使整个数据流更加清晰
+     */
     initCategoryNum() {
-      let cartFoodNum = 0;
+      // let cartFoodNum = 0;
       this.totalPrice = 0;
       this.cartFoodList = [];
       let num = 0;
@@ -164,22 +174,65 @@ export default {
               num += foodItem.num;
               this.totalPrice += foodItem.num * foodItem.price;
               if (foodItem.num > 0) {
-                this.cartFoodList[cartFoodNum] = {};
-                this.cartFoodList[cartFoodNum].category_id = categoryId;
-                this.cartFoodList[cartFoodNum].item_id = itemid;
-                this.cartFoodList[cartFoodNum].food_id = foodid;
-                this.cartFoodList[cartFoodNum].num = foodItem.num;
-                this.cartFoodList[cartFoodNum].price = foodItem.price;
-                this.cartFoodList[cartFoodNum].name = foodItem.name;
-                this.cartFoodList[cartFoodNum].specfoods = [];
-                this.cartFoodList[cartFoodNum].specfoods[0] = {};
-                this.cartFoodList[cartFoodNum].specfoods[0].food_id = foodid;
-                this.cartFoodList[cartFoodNum].specfoods[0].name = foodItem.name;
-                this.cartFoodList[cartFoodNum].specfoods[0].price = foodItem.price;
-                this.cartFoodList[cartFoodNum].specfoods[0].packing_fee = foodItem.packing_fee;
-                this.cartFoodList[cartFoodNum].specfoods[0].sku_id = foodItem.sku_id;
-                this.cartFoodList[cartFoodNum].specfoods[0].stock = foodItem.stock;
-                cartFoodNum++;
+                let cartFood = {
+                  category_id: categoryId,
+                  item_id: itemid,
+                  food_id: foodid,
+                  num: foodItem.num,
+                  price: foodItem.price,
+                  name: foodItem.name,
+                  specfoods: []
+                };
+
+                let specfood = {
+                  'food_id': foodid,
+                  'name': foodItem.name,
+                  'price': foodItem.price,
+                  'packing_fee': foodItem.packing_fee,
+                  'sku_id': foodItem.sku_id,
+                  'stock': foodItem.stock
+                };
+
+                // push 可以监听数组变化(这里点击的时候才会显示购物车详情，所以不是响应式也不影响)
+                cartFood.specfoods.push(specfood);
+                this.cartFoodList.push(cartFood);
+
+                // let cartFood = {};
+                // cartFood.category_id = categoryId;
+                // cartFood.item_id = itemid;
+                // cartFood.food_id = foodid;
+                // cartFood.num = foodItem.num;
+                // cartFood.price = foodItem.price;
+                // cartFood.name = foodItem.name;
+                // cartFood.specfoods = [];
+                // let specfood = {};
+                // specfood.food_id = foodid;
+                // specfood.name = foodItem.name;
+                // specfood.price = foodItem.price;
+                // specfood.packing_fee = foodItem.packing_fee;
+                // specfood.sku_id = foodItem.sku_id;
+                // specfood.stock = foodItem.stock;
+                // // push 可以监听数组变化(这里点击的时候才会显示购物车详情，所以不是响应式也不影响)
+                // cartFood.specfoods.push(specfood);
+                // this.cartFoodList.push(cartFood);
+
+                // // 索引不能监听数组变化
+                // this.cartFoodList[cartFoodNum] = {};
+                // this.cartFoodList[cartFoodNum].category_id = categoryId;
+                // this.cartFoodList[cartFoodNum].item_id = itemid;
+                // this.cartFoodList[cartFoodNum].food_id = foodid;
+                // this.cartFoodList[cartFoodNum].num = foodItem.num;
+                // this.cartFoodList[cartFoodNum].price = foodItem.price;
+                // this.cartFoodList[cartFoodNum].name = foodItem.name;
+                // this.cartFoodList[cartFoodNum].specfoods = [];
+                // this.cartFoodList[cartFoodNum].specfoods[0] = {};
+                // this.cartFoodList[cartFoodNum].specfoods[0].food_id = foodid;
+                // this.cartFoodList[cartFoodNum].specfoods[0].name = foodItem.name;
+                // this.cartFoodList[cartFoodNum].specfoods[0].price = foodItem.price;
+                // this.cartFoodList[cartFoodNum].specfoods[0].packing_fee = foodItem.packing_fee;
+                // this.cartFoodList[cartFoodNum].specfoods[0].sku_id = foodItem.sku_id;
+                // this.cartFoodList[cartFoodNum].specfoods[0].stock = foodItem.stock;
+                // cartFoodNum++;
               }
             });
           });
@@ -187,6 +240,7 @@ export default {
       });
       this.totalPrice = this.totalPrice.toFixed(2);
       this.totalNumber = num;
+      console.log('shopcart-list', this.cartFoodList);
     }
   },
   watch: {
@@ -203,6 +257,9 @@ export default {
     },
     cartClick () {
       this._ballDrop(this.$store.state.cartClickTarget);
+    },
+    cartFoodList() {
+      console.log('购物车');
     }
 
   },
@@ -230,7 +287,7 @@ export default {
       return this.$store.state.cartClickStatus;
     },
     shopCart: function () {
-      console.log('change2');
+      // console.log('change2');
       // console.log('shopcart', this.cartList[this.shopId]);
       return { ...this.cartList[this.shopId] }; // 返回this.cartList[this.shopId]的复制
     }
@@ -390,15 +447,15 @@ export default {
     height 100%
     background-color rgba(7, 17, 27, 0.6)
   .ball
+    position fixed
+    z-index 111
+    left 32px
+    bottom 22px
     &.drop-enter-active
       transition all 0.4s linear
       .ball_inner
         transition all 0.4s cubic-bezier(0.56, -0.71, 0.7, -0.09)
     .ball_inner
-      position fixed
-      z-index 111
-      left 32px
-      bottom 22px
       width 16px
       height 16px
       border-radius 50%

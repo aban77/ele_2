@@ -13,7 +13,7 @@ export default {
     sku_id,
     stock
   }) {
-    let cart = JSON.parse(JSON.stringify(state.cartList));
+    let cart = state.cartList;
     // console.log('getcart-cart', cart);
     // debugger;
     let shop = cart[shopid] = (cart[shopid] || {});
@@ -64,7 +64,7 @@ export default {
     price,
     specs
   }) {
-    let cart = JSON.parse(JSON.stringify(state.cartList));
+    let cart = state.cartList;
     let shop = (cart[shopid] || {});
     let category = (shop[category_id] || {});
     let item = (category[item_id] || {});
@@ -93,9 +93,6 @@ export default {
     let initCart = getLocalStorage('buyCart');
     if (initCart) {
       state.cartList = JSON.parse(initCart);
-      // console.log('getcarList', state.cartList);
-      // console.log('getcarList', { ...state.cartList });
-      // console.log('getcarList', Object.assign({}, state.cartList));
     }
   },
   // 清空当前商品的购物车信息
@@ -105,7 +102,7 @@ export default {
     setLocalStorage('buyCart', JSON.stringify(state.cartList));
   },
   cartClickEvent (state, target) {
-    state.cartClickStatus++;
+    state.cartClickStatus = !state.cartClickStatus;
     state.cartClickTarget = target;
     console.log('store.state', state);
   },
