@@ -43,7 +43,7 @@
       </div>
     </transition>
     <div class="mask"
-         v-show="detailStatus"></div>
+         v-show="detailStatus" @click='detailStatus=false'></div>
 
     <div class="ball-container">
       <transition-group @before-enter="beforeEnter"
@@ -132,19 +132,12 @@ export default {
       let index = this.dropBalls.shift();
       this.popBalls.push(index);
       let position = this.balls[index].el.getBoundingClientRect();
-
-      console.log('ballposition', position.left, position.bottom);
       let x = position.left - 32;
       let y = -(window.innerHeight - position.top - 22);
-
-      console.log('x', x);
-      console.log('y', y);
       ele.style.webkitTransform = `translate3d(${x}px,0,0)`;
       ele.style.transform = `translate3d(${x}px,0,0)`;
       ele.querySelector('.ball_inner').style.webkitTransform = `translate3d(0, ${y}px, 0)`;
       ele.querySelector('.ball_inner').style.transform = `translate3d(0, ${y}px, 0)`;
-      console.log('window', window.outerHeight, window.outerWidth);
-      console.log('window', window.innerHeight, window.innerWidth);
     },
     enter (ele) {
       this.$nextTick(() => {
@@ -240,13 +233,11 @@ export default {
       });
       this.totalPrice = this.totalPrice.toFixed(2);
       this.totalNumber = num;
-      console.log('shopcart-list', this.cartFoodList);
     }
   },
   watch: {
     shopCart: function() {
       this.initCategoryNum();
-      console.log('change3');
     },
 
     totalNumber (val, oldVal) {
@@ -287,8 +278,6 @@ export default {
       return this.$store.state.cartClickStatus;
     },
     shopCart: function () {
-      // console.log('change2');
-      // console.log('shopcart', this.cartList[this.shopId]);
       return { ...this.cartList[this.shopId] }; // 返回this.cartList[this.shopId]的复制
     }
 

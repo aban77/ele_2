@@ -1,22 +1,22 @@
 <template>
   <div class="cart-control">
     <transition name="move">
-      <div v-show="foodNum>0"
+      <div v-show="food.num"
            class="decrease-outer"
            @click.stop="decCount (food.category_id, food.item_id, food.specfoods[0].food_id, food.specfoods[0].name,food.specfoods[0].price, food.specfoods[0].packing_fee, food.specfoods[0].sku_id, food.specfoods[0].stock)">
         <span class="icon-remove_circle_outline cart-decrease"></span>
       </div>
     </transition>
-    <div v-show="foodNum>0"
-         class="cart-count">{{foodNum}}</div>
+    <div v-show="food.num"
+         class="cart-count">{{food.num}}</div>
     <span class="cart-add icon-add_circle"
           @click.stop="addClick(food.category_id, food.item_id, food.specfoods[0].food_id, food.specfoods[0].name, food.specfoods[0].price, '', food.specfoods[0].packing_fee, food.specfoods[0].sku_id, food.specfoods[0].stock, $event)"></span>
-    <span v-show='food.num>0'>{{food.num}}</span>
+
   </div>
 </template>
 
 <script type="text/ecmascript-6">
-import { mapState, mapMutations } from 'vuex';
+import { mapMutations } from 'vuex';
 export default {
   data() {
     return {
@@ -34,41 +34,42 @@ export default {
     ]),
     addClick (category_id, item_id, food_id, name, price, specs, packing_fee, sku_id, stock, event) {
       this.ADD_CART({ shopid: this.shopId, category_id, item_id, food_id, name, price, specs, packing_fee, sku_id, stock });
+      console.log('food', this.food);
       this.$store.commit('cartClickEvent', event.target);
     },
     decCount (category_id, item_id, food_id, name, price, specs) {
       this.REDUCE_CART({ shopid: this.shopId, category_id, item_id, food_id, name, price, specs });
     }
 
-  },
-  computed: {
-    ...mapState([
-      'cartList'
-    ])
-  },
-  watch: {
-
-    cartList: {
-      handler: function (val, oldVal) {
-        console.log('change');
-        let shopCart = this.cartList[this.shopId];
-        let category_id = this.food.category_id;
-        let item_id = this.food.item_id;
-        if (shopCart && shopCart[category_id] && shopCart[category_id][item_id]) {
-          let num = 0;
-          Object.values(shopCart[category_id][item_id]).forEach((item, index) => {
-            num += item.num;
-          });
-          this.foodNum = num;
-        } else {
-          this.foodNum = 0;
-        }
-      },
-      deep: false,
-      immediate: true
-
-    }
   }
+  // computed: {
+  //   ...mapState([
+  //     'cartList'
+  //   ])
+  // }
+  // watch: {
+
+  //   cartList: {
+  //     handler: function (val, oldVal) {
+  //       console.log('change');
+  //       let shopCart = this.cartList[this.shopId];
+  //       let category_id = this.food.category_id;
+  //       let item_id = this.food.item_id;
+  //       if (shopCart && shopCart[category_id] && shopCart[category_id][item_id]) {
+  //         let num = 0;
+  //         Object.values(shopCart[category_id][item_id]).forEach((item, index) => {
+  //           num += item.num;
+  //         });
+  //         this.foodNum = num;
+  //       } else {
+  //         this.foodNum = 0;
+  //       }
+  //     },
+  //     deep: false,
+  //     immediate: true
+
+  //   }
+  // }
 };
 </script>
 

@@ -67,7 +67,7 @@ import { getFoodList } from '../../api/getData';
 import supportIco from '../support-ico/support-ico';
 import cartControl from '../cart-control/cart-control';
 import foodDetail from '../food-detail/food-detail';
-
+import { mapState } from 'vuex';
 export default {
   data () {
     return {
@@ -101,11 +101,37 @@ export default {
       this.detailFood = food;
       this.detailFoodShow = true;
     },
+    initGoodsNum() {
+      let shopCart = this.cartList[this.shopId];
+      // console.log('shopchange');
+      // console.log(this.goods);
+      // console.log(this.cartList);
+      this.goods.forEach((item) => {
+        if (shopCart && shopCart[item.foods[0].category_id]) {
+          item.foods.forEach(food => {
+            let num = 0;
+            if (shopCart[item.foods[0].category_id][food.item_id]) {
+              Object.keys(shopCart[item.foods[0].category_id][food.item_id]).forEach(foodid => {
+                let foodItem = shopCart[item.foods[0].category_id][food.item_id][foodid];
+                num += foodItem.num;
+              });
+              this.$set(food, 'num', num);
+            } else {
+              this.$set(food, 'num', num);
+            }
+          }
+          );
+        } else {
+          item.foods.forEach(food => { this.$set(food, 'num', 0); });
+        }
+      });
+    },
     async getGoods (id) {
       this.goods = await getFoodList(id);
       console.log('this.goods', this.goods);
       this.$nextTick(() => {
         this.calHeight();
+        this.initGoodsNum();
       });
     }
   },
@@ -113,13 +139,6 @@ export default {
     this.geohash = this.$route.query.geohash;
     this.shopId = this.$route.query.id;
     this.getGoods(this.shopId);
-  //   getGoods().then(res => {
-  //     this.goods = res;
-  //     // console.log(res);
-  //     this.$nextTick(() => {
-  //       this.calHeight();
-  //     });
-  //   });
   },
   mounted () {
     this.$refs.foods.addEventListener('scroll', (event) => {
@@ -140,6 +159,23 @@ export default {
     'support-ico': supportIco,
     'cart-control': cartControl,
     'food-detail': foodDetail
+  },
+  watch: {
+    cartList: {
+      handler() {
+        this.initGoodsNum();
+      }
+    }
+
+  },
+  computed: {
+    ...mapState([
+      'cartList'
+    ])
+
+    // shopCart: function () {
+    //   return { }; // 返回this.cartList[this.shopId]的复制
+    // }
   }
 };
 </script>
