@@ -16,7 +16,7 @@
 
       <div class="cart-right">
         <div class="minPrice"
-             :class="{'settlement':totalPrice-minPrice>=0}"><span>{{payText}}</span></div>
+             :class="{'settlement':totalPrice-minPrice>=0}"><span @click="submitOrder">{{payText}}</span></div>
       </div>
 
     </div>
@@ -97,7 +97,8 @@ export default {
   props: {
     deliveryPrice: Number,
     minPrice: Number,
-    shopId: String
+    shopId: String,
+    geohash: String
   },
   methods: {
     ...mapMutations([
@@ -115,6 +116,16 @@ export default {
       //   food.cartFoodList = 0;
       // });
       this.CLEAR_CART(this.shopId);
+    },
+    submitOrder() {
+      if (this.totalPrice >= this.minPrice) {
+        this.$router.push({ path: '/confirmOrder',
+          query: {
+            shopId: this.shopId,
+            geohash: this.geohash
+          }
+        });
+      }
     },
     _ballDrop (target) {
       for (let i = 0; i < BALL_NUMBER; i++) {

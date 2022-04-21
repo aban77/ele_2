@@ -90,6 +90,7 @@ export default {
   },
   // 网页初始化时从本地缓存获取购物车数据
   INIT_BUYCART(state) {
+    console.log('init buycart');
     let initCart = getLocalStorage('buyCart');
     if (initCart) {
       state.cartList = JSON.parse(initCart);

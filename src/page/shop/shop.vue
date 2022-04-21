@@ -1,5 +1,6 @@
 <template>
   <div class="shop">
+    <back></back>
     <v-header :seller="seller"></v-header>
     <div class="tab border-1px">
       <router-link :to="{path:'/shop/goods',query:{geohash: '31.23037,121.473701', id: shopId}}" >商品</router-link>
@@ -14,7 +15,8 @@
       <shopcart ref="shopcart"
                 :deliveryPrice="seller.float_delivery_fee"
                 :minPrice="seller.float_minimum_order_amount"
-                :shopId='shopId'></shopcart>
+                :shopId='shopId'
+                :geohash='geohash'></shopcart>
     </div>
   </div>
 </template>
@@ -24,6 +26,7 @@ import { mapMutations } from 'vuex';
 import header from '../../components/header/header';
 import { getShopInfo } from '../../api/getData';
 import shopcart from '../../components/shopcart/shopcart';
+import back from '../../components/back/back';
 export default {
   data () {
     return {
@@ -56,7 +59,8 @@ export default {
   },
   components: {
     'v-header': header,
-    'shopcart': shopcart
+    'shopcart': shopcart,
+    'back': back
   }
 };
 </script>
@@ -64,6 +68,7 @@ export default {
 <style lang="stylus">
 @import '../../common/stylus/mixin.styl'
 .shop
+
   .tab
     display flex
     width 100%

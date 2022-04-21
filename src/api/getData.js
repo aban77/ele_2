@@ -61,3 +61,38 @@ export function getShopInfo(restaurantId) {
   return axios.get(`/shopping/restaurant/${restaurantId}`).then(res => res.data
   ).catch(err => console.log(err));
 }
+
+export function addNewAddress(Authorization, address, address_detail, geohash, name, phone, phone_bk, poi_type, sex, tag, tag_type) {
+  if (Authorization) {
+    let params = {
+      address, address_detail, geohash, name, phone, phone_bk, poi_type, sex, tag, tag_type
+    };
+
+    return axios.post('/v1/users/addresses', params, { headers: { Authorization } }).then(res => res.data
+    ).catch(err => console.log(err));
+  }
+}
+export function getAddressList(Authorization) {
+  if (Authorization) {
+    return axios.get('/v1/users/addresses', { headers: { Authorization } }).then(res => res.data
+    ).catch(err => console.log(err));
+  }
+}
+
+/**
+ * 确认订单
+ */
+
+export function checkout(Authorization, geohash, entities, shopid) {
+  console.log('checkout');
+  let params =
+    {
+      come_from: 'web',
+      geohash,
+      entities,
+      restaurant_id: shopid
+    };
+
+  axios.post('/v1/carts/checkout', params, { headers: { Authorization } }).then(res => res.data
+  ).catch(err => console.log(err));
+}

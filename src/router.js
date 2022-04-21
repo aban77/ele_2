@@ -5,9 +5,13 @@ const home = () => import(/* webpackChunkName: "home" */ './page/home/home');
 const order = () => import(/* webpackChunkName: "order" */ './page/order/order');
 const profile = () => import(/* webpackChunkName: "profile" */ './page/profile/profile');
 const profileInfo = () => import(/* webpackChunkName: "info" */ './page/profile/children/info/info');
+const address = () => import(/* webpackChunkName: "address" */ './page/profile/children/info/children/address');
+const addAddress = () => import(/* webpackChunkName: "addAddress" */ './page/profile/children/info/children/children/addAddress');
+
 const login = () => import(/* webpackChunkName: "login" */ './page/login/login');
 const shop = () => import(/* webpackChunkName: "shop" */ './page/shop/shop');
 const goods = () => import(/* webpackChunkName: "goods" */ './components/goods/goods');
+const confirmOrder = () => import(/* webpackChunkName: "confirmOrder" */ './page/confirmOrder/confirmOrder');
 // import goods from './components/goods/goods.vue';
 // import ratings from './components/ratings/ratings';
 // import seller from './components/seller/seller';
@@ -44,7 +48,17 @@ const router = new Router({
       children: [
         {
           path: 'info', // 个人信息详情页
-          component: profileInfo
+          component: profileInfo,
+          children: [
+            {
+              path: 'address',
+              component: address,
+              children: [{
+                path: 'addAddress',
+                component: addAddress
+              }]
+            }
+          ]
 
         }]
 
@@ -65,6 +79,9 @@ const router = new Router({
           component: goods
 
         }]
+    }, {
+      path: '/confirmOrder',
+      component: confirmOrder
     }
   ]
 });
