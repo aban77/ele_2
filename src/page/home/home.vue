@@ -49,4 +49,8 @@ export default {
 </script>
 
 <style lang="stylus" rel="stylesheet/stylus">
+.home
+  display: relative
+  height: 100%
+  width: 100%
 </style>
